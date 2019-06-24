@@ -7,6 +7,31 @@
     <!-- 如果采用注解方式，并且配置中有静态资源的配置，那么要加这个，不然访问不到controller -->
     <mvc:annotation-driven validator="myValidator" conversion-service="conversionService"/>
 
+    <!-- 内部视图解析器,这样我们在controller中就不必写html文件的全路径了 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/jsp/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <!-- 外部视图解析器,用于转到公网html页面,前端html页面写下面的id -->
+    <bean class="org.springframework.web.servlet.view.BeanNameViewResolver"></bean>
+    <bean id="baidu" class="org.springframework.web.servlet.view.RedirectView">
+        <property name="url" value="http://www.baidu.com"></property>
+    </bean>
+
+    <!-- ============================================================================================ -->
+    <!-- 此为第一种方式，但是这种方式是有缺点的，每个controller处理一个路径的请求，那么处理一万的请求可能会有一万个controller，所以有了注解请求的方式 -->
+    <!-- 注册controller,映射hello.do这个路径 -->
+    <!-- <bean id="/hello.do" class="com.yushu.controller.HelloController"/> -->
+
+    <!-- 方式二：注解请求 - 扫描这个包下面的所有注解-->
+    <context:component-scan base-package="com.yushu.*"></context:component-scan>
+    <!-- ============================================================================================ -->
+
+    <!-- 访问不到静态资源,因为没有处理.jpg等后缀的servlet，这样就不会匹配DispatcherServlet的mapping-->
+    <mvc:resources mapping="/images/**" location="/images/"></mvc:resources>
+
+    <!-- ============================================================================================ -->
     <!-- 使用apache的commons-io和commons-fileupload实现文件上传 -->
     <!-- 注册multipartResolver,由DispatcherServlet来负责调用 -->
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
@@ -25,25 +50,28 @@
         <!--是否使用懒加载，默认是false-->
         <property name="resolveLazily" value="true"/>
     </bean>
+    <!-- ============================================================================================ -->
 
     <!--验证器-->
     <bean id="myValidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
         <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
     </bean>
 
+    <!-- ============================================================================================ -->
     <!-- 方式1 - jdk8,再方法参数中或类属性中添加@DateTimeFormat(pattern="")注解 -->
     <!-- 方式2 - 日期转换，比如前台提交一个表单，后台代码参数写的是Date类型，那么是会报错400 bad request的，那么就需要我们写一个日期转换器来转换字符串到日期 -->
     <!-- 注册日期类型转换器 -->
     <bean id="dateConvert" class="com.yushu.convert.DateConvert"></bean>
+    <!-- ============================================================================================ -->
 
+    <!-- ============================================================================================-->
     <!-- 注册类型转换服务的bean -->
     <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
         <property name="converters" ref="dateConvert"></property>
     </bean>
+    <!-- ============================================================================================ -->
 
-    <!-- 方式二：注解请求 - 扫描这个包下面的所有注解-->
-    <context:component-scan base-package="com.yushu.*"></context:component-scan>
-
+    <!-- ============================================================================================ -->
     <!-- 全局异常处理 - 方式1 -->
     <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
         <property name="exceptionMappings">
@@ -62,24 +90,5 @@
     <!-- 全局异常处理 - 方式2 注册bean -->
     <!-- 上面那种没有统一接收异常的地方，那么比如记录日志就要在每个抛异常的地方，这里的好处是全局记录日志，需要注释掉上面 -->
     <bean class="com.yushu.exception.MyExceptionResolver"></bean>
-
-    <!-- 外部视图解析器,用于转到公网html页面,前端html页面写下面的id -->
-    <bean class="org.springframework.web.servlet.view.BeanNameViewResolver"></bean>
-    <bean id="baidu" class="org.springframework.web.servlet.view.RedirectView">
-        <property name="url" value="http://www.baidu.com"></property>
-    </bean>
-
-    <!-- 内部视图解析器,这样我们在controller中就不必写html文件的全路径了 -->
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix" value="/jsp/" />
-        <property name="suffix" value=".jsp" />
-    </bean>
-
-
-    <!-- 问题2 访问不到静态资源,因为没有处理.jpg等后缀的servlet，这样就不会匹配DispatcherServlet的mapping-->
-    <mvc:resources mapping="/images/**" location="/images/"></mvc:resources>
-
-    <!-- 此为第一种方式，但是这种方式是有缺点的，每个controller处理一个路径的请求，那么处理一万的请求可能会有一万个controller，所以有了注解请求的方式 -->
-    <!-- 注册controller,映射hello.do这个路径 -->
-    <!-- <bean id="/hello.do" class="com.yushu.controller.HelloController"/> -->
+    <!-- ============================================================================================ -->
 </beans>
