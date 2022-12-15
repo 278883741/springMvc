@@ -35,7 +35,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
-      <version>5.0.4.RELEASE</version>
+      <version>5.2.20.RELEASE</version>
     </dependency>
 
     <!-- 一定要加下面几个json，要不controller里responseBody写数据报错cannot convert -->
